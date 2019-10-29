@@ -27,6 +27,7 @@ class User extends Model {
     return this;
   }
 
+  // cada id no File corresponde a um avatar_id no User
   static associate(models) {
     this.belongsTo(models.File, { foreignKey: 'avatar_id' });
   }
