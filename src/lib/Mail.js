@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import { resolve } from 'path';
+import exphbs from 'express-handlebars';
+import nodemailerhbs from 'nodemailer-express-handlebars';
 import mailConfig from '../config/mail';
 
 class Mail {
@@ -11,6 +14,26 @@ class Mail {
       secure,
       auth: auth.user ? auth : null, // algumas estratégias de envio de emails não possuem autenticação
     });
+
+    this.configureTemplates();
+  }
+
+  configureTemplates() {
+    const viewPath = resolve(__dirname, '..', 'app', 'views', 'emails');
+    // como ele compila/formata os templates de email
+    this.transporter.use(
+      'compile',
+      nodemailerhbs({
+        viewEngine: exphbs.create({
+          layoutsDir: resolve(viewPath, 'layouts'),
+          partialsDir: resolve(viewPath, 'partials'),
+          defaultLayout: 'default',
+          extname: '.hbs',
+        }),
+        viewPath,
+        extName: '.hbs',
+      })
+    );
   }
 
   sendMail(message) {
